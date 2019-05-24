@@ -22,6 +22,9 @@
 		88DBC29F1FE83D4400255921 /* JobManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC29E1FE83D4400255921 /* JobManager.swift */; };
 		88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC2A21FE83DB800255921 /* CancelGroup.swift */; };
 		88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88ECCC921DF92F22000C967E /* Assets.xcassets */; };
+		E43BAC4922974988007F7C75 /* ShaderTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = E43BAC4622974988007F7C75 /* ShaderTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E43BAC4A22974988007F7C75 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43BAC4722974988007F7C75 /* Renderer.swift */; };
+		E43BAC4B22974988007F7C75 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = E43BAC4822974988007F7C75 /* Shaders.metal */; };
 		E447A1262266629600578C0B /* ArcGISARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447A1252266629600578C0B /* ArcGISARView.swift */; };
 		E447A1282266630400578C0B /* ArcGISARSensorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447A1272266630400578C0B /* ArcGISARSensorView.swift */; };
 		E46893291FEDAE36008ADA79 /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893281FEDAE36008ADA79 /* Compass.swift */; };
@@ -47,6 +50,9 @@
 		88DBC29E1FE83D4400255921 /* JobManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobManager.swift; sourceTree = "<group>"; };
 		88DBC2A21FE83DB800255921 /* CancelGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelGroup.swift; sourceTree = "<group>"; };
 		88ECCC921DF92F22000C967E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ArcGISToolkit/Assets.xcassets; sourceTree = "<group>"; };
+		E43BAC4622974988007F7C75 /* ShaderTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		E43BAC4722974988007F7C75 /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		E43BAC4822974988007F7C75 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		E447A1252266629600578C0B /* ArcGISARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcGISARView.swift; sourceTree = "<group>"; };
 		E447A1272266630400578C0B /* ArcGISARSensorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcGISARSensorView.swift; sourceTree = "<group>"; };
 		E46893281FEDAE36008ADA79 /* Compass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compass.swift; sourceTree = "<group>"; };
@@ -136,6 +142,9 @@
 		E447A1242266628300578C0B /* AR */ = {
 			isa = PBXGroup;
 			children = (
+				E43BAC4722974988007F7C75 /* Renderer.swift */,
+				E43BAC4822974988007F7C75 /* Shaders.metal */,
+				E43BAC4622974988007F7C75 /* ShaderTypes.h */,
 				E447A1252266629600578C0B /* ArcGISARView.swift */,
 				E447A1272266630400578C0B /* ArcGISARSensorView.swift */,
 			);
@@ -150,6 +159,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				881233751DF601A700B2EA8E /* ArcGISToolkit.h in Headers */,
+				E43BAC4922974988007F7C75 /* ShaderTypes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,6 +241,7 @@
 				E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */,
 				E447A1282266630400578C0B /* ArcGISARSensorView.swift in Sources */,
 				E447A1262266629600578C0B /* ArcGISARView.swift in Sources */,
+				E43BAC4B22974988007F7C75 /* Shaders.metal in Sources */,
 				883EA74F20741B9C006D6F72 /* TemplatePickerViewController.swift in Sources */,
 				883EA74920741A4C006D6F72 /* PopupController.swift in Sources */,
 				88B68A011E96EFD700B67FAB /* MeasureToolbar.swift in Sources */,
@@ -239,6 +250,7 @@
 				88B68A071E96EFD700B67FAB /* TableViewController.swift in Sources */,
 				88B689FD1E96EFD700B67FAB /* Extensions.swift in Sources */,
 				88B68A741E9D7F6300B67FAB /* Coalescer.swift in Sources */,
+				E43BAC4A22974988007F7C75 /* Renderer.swift in Sources */,
 				88B68A001E96EFD700B67FAB /* MapViewController.swift in Sources */,
 				E46893291FEDAE36008ADA79 /* Compass.swift in Sources */,
 			);

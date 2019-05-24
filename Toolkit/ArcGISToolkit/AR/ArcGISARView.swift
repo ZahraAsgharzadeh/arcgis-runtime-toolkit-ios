@@ -15,12 +15,21 @@
 import UIKit
 import ARKit
 import ArcGIS
+import Metal
+import MetalKit
+
+extension MTKView : RenderDestinationProvider {
+}
+
 
 public class ArcGISARView: UIView {
     
     // MARK: public properties
     
-    public lazy private(set) var arSCNView = ARSCNView(frame: .zero)
+    var renderer: Renderer!
+    var session: ARSession!
+    var metalView = MTKView(frame: .zero)
+    
     public lazy private(set) var sceneView = AGSSceneView(frame: .zero)
     public var arConfiguration: ARConfiguration = ARWorldTrackingConfiguration() {
         didSet {
@@ -83,13 +92,31 @@ public class ArcGISARView: UIView {
     }
     
     private func sharedInitialization(){
+        
+        session = ARSession()
+        session.delegate = self
+
+        // add metal view
+        addSubviewWithConstraints(metalView)
+        // Set the view to use the default device
+        metalView.device = MTLCreateSystemDefaultDevice()
+        metalView.backgroundColor = UIColor.clear
+        metalView.delegate = self
+        
+        guard metalView.device != nil else {
+            print("Metal is not supported on this device")
+            return
+        }
+                
+        // Configure the renderer to draw to the view
+        renderer = Renderer(session: session, metalDevice: metalView.device!, renderDestination: metalView)
+        
+        renderer.drawRectResized(size: metalView.bounds.size)
+
         //
         // ARKit initialization
         isSupported = ARWorldTrackingConfiguration.isSupported
-        
-        addSubviewWithConstraints(arSCNView)
-        arSCNView.session.delegate = self
-        
+
         //
         // add sceneView to view and setup constraints
         addSubviewWithConstraints(sceneView)
@@ -106,6 +133,7 @@ public class ArcGISARView: UIView {
         
         //figure out how to do this better:
         arConfiguration.worldAlignment = .gravityAndHeading
+
     }
 
     // MARK: Public
@@ -170,7 +198,7 @@ public class ArcGISARView: UIView {
     }
 
     public func stopTracking() {
-        arSCNView.session.pause()
+        session.pause()
         stopUpdatingLocationAndHeading()
         
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
@@ -181,8 +209,8 @@ public class ArcGISARView: UIView {
     
     // MARK: Private
     fileprivate func finalizeStart() {
-        arSCNView.isHidden = !renderVideoFeed
-        arSCNView.session.run(arConfiguration, options:.resetTracking)
+        metalView.isHidden = !renderVideoFeed
+        session.run(arConfiguration, options:.resetTracking)
         didStartOrFailWithError(nil)
     }
 
@@ -310,14 +338,17 @@ extension ArcGISARView: ARSessionDelegate {
 
         delegate?.session?(session, didUpdate: frame)
         
+        if renderer != nil {
+            renderer.update(frame: frame)
+        }
         //
         // Debug - here's the switch between currentFrame and frame...
         //
         
         // create transformation matrix
-        guard let currentFrame = session.currentFrame else { return }
-        let cameraTransform = currentFrame.camera.transform
-//        let cameraTransform = frame.camera.transform
+//        guard let currentFrame = session.currentFrame else { return }
+//        let cameraTransform = currentFrame.camera.transform
+        let cameraTransform = frame.camera.transform
         
         //
         // Debug - calculate and display time difference between frame and currentFrame
@@ -357,10 +388,10 @@ extension ArcGISARView: ARSessionDelegate {
         //        let svCamera = sceneView.currentViewpointCamera()
         //        print("sceneView.Camera heading: \(svCamera.heading), pitch = \(svCamera.pitch), roll = \(svCamera.roll), location = \(svCamera.location)")
         
-//        Thread.sleep(forTimeInterval: 0.25)
+//        Thread.sleep(forTimeInterval: 0.1)
         sceneView.renderFrame()
         frameCount = frameCount + 1
-//        Thread.sleep(forTimeInterval: 0.25)
+//        Thread.sleep(forTimeInterval: 0.1)
     }
 
     /**
@@ -551,7 +582,7 @@ extension ArcGISARView: CLLocationManagerDelegate {
         
         print("didUpdateLocations...")
     }
-
+    
     //
     // Debug - show point in front of camera...
     //
@@ -565,7 +596,7 @@ extension ArcGISARView: CLLocationManagerDelegate {
         
         //  move camera forward 1 meters and get location
         let location = camera.moveForward(withDistance: 1.0).location
-
+        
         let graphic = AGSGraphic(geometry: location, symbol: markerSymbol, attributes: nil)
         go.graphics.add(graphic)
     }
@@ -590,7 +621,7 @@ extension ArcGISARView: CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         didStartOrFailWithError(error)
     }
-
+    
     /*
      *  locationManager:didChangeAuthorizationStatus:
      *
@@ -608,7 +639,7 @@ extension ArcGISARView: CLLocationManagerDelegate {
             handleAuthStatusChangedAccessAuthorized()
         }
     }
-
+    
     /*
      *  Discussion:
      *    Invoked when location updates are automatically paused.
@@ -627,5 +658,15 @@ extension ArcGISARView: CLLocationManagerDelegate {
     @available(iOS 6.0, *)
     public func locationManagerDidResumeLocationUpdates(_ manager: CLLocationManager) {
         
+    }
+}
+
+// MARK: - CLLocationManagerDelegate
+extension ArcGISARView: MTKViewDelegate {
+    public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        
+    }
+    
+    public func draw(in view: MTKView) {
     }
 }

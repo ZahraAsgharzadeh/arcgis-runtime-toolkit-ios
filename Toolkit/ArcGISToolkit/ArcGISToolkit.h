@@ -21,4 +21,4 @@ FOUNDATION_EXPORT const unsigned char ArcGISToolkitVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <ArcGISToolkit/PublicHeader.h>
 
-
+#import "ShaderTypes.h"
