@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="WR1-5V-ocl">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="WR1-5V-ocl">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15400"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -53,12 +53,13 @@
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <outlet property="activityIndicatorView" destination="bD6-Rq-9Ez" id="Ct9-2W-Jgx"/>
-                                    <outlet property="legendImageView" destination="ENx-U2-2wK" id="SbD-u4-Pnp"/>
-                                    <outlet property="name" destination="UYu-Ab-2C2" id="Hvn-c7-sUM"/>
+                                    <outlet property="activityIndicatorView" destination="bD6-Rq-9Ez" id="Eme-FS-aaw"/>
+                                    <outlet property="indentationConstraint" destination="3aj-Dh-1SJ" id="Wr8-sJ-I1O"/>
+                                    <outlet property="legendImageView" destination="ENx-U2-2wK" id="dDt-xS-qpb"/>
+                                    <outlet property="nameLabel" destination="UYu-Ab-2C2" id="HAb-5O-QVm"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="LayerTitle" id="gj6-Kb-3zF" customClass="LayerTitleCell" customModule="ArcGISToolkit" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="LayerTitle" id="gj6-Kb-3zF" customClass="LayerCell" customModule="ArcGISToolkit" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="48.5" width="414" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="gj6-Kb-3zF" id="eiZ-cd-Upr">
@@ -66,44 +67,88 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qCc-Am-7U7">
-                                            <rect key="frame" x="8" y="11.5" width="398" height="20.5"/>
+                                            <rect key="frame" x="46" y="11.5" width="303" height="20.5"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qjr-f6-CC9">
+                                            <rect key="frame" x="357" y="6.5" width="51" height="31"/>
+                                            <connections>
+                                                <action selector="visibilityChanged:" destination="gj6-Kb-3zF" eventType="valueChanged" id="ipb-U9-RGI"/>
+                                            </connections>
+                                        </switch>
+                                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ihQ-ML-iVw">
+                                            <rect key="frame" x="8" y="7" width="30" height="30"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="30" id="pxE-W6-fcs"/>
+                                            </constraints>
+                                            <state key="normal" title="&gt;"/>
+                                            <connections>
+                                                <action selector="accordianAction:" destination="gj6-Kb-3zF" eventType="touchUpInside" id="oQu-eA-hO1"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="qCc-Am-7U7" firstAttribute="leading" secondItem="eiZ-cd-Upr" secondAttribute="leading" constant="8" id="4yB-fG-ltf"/>
+                                        <constraint firstItem="ihQ-ML-iVw" firstAttribute="leading" secondItem="eiZ-cd-Upr" secondAttribute="leading" constant="8" id="5D5-eq-j5c"/>
+                                        <constraint firstItem="qCc-Am-7U7" firstAttribute="leading" secondItem="ihQ-ML-iVw" secondAttribute="trailing" constant="8" id="RzK-Jw-2rS"/>
                                         <constraint firstItem="qCc-Am-7U7" firstAttribute="centerY" secondItem="eiZ-cd-Upr" secondAttribute="centerY" id="YZb-uz-qkU"/>
-                                        <constraint firstAttribute="trailing" secondItem="qCc-Am-7U7" secondAttribute="trailing" constant="8" id="maE-nR-b5O"/>
+                                        <constraint firstItem="ihQ-ML-iVw" firstAttribute="centerY" secondItem="eiZ-cd-Upr" secondAttribute="centerY" id="aay-C2-NVX"/>
+                                        <constraint firstAttribute="trailing" secondItem="Qjr-f6-CC9" secondAttribute="trailing" constant="8" id="ePK-7G-znI"/>
+                                        <constraint firstItem="Qjr-f6-CC9" firstAttribute="centerY" secondItem="eiZ-cd-Upr" secondAttribute="centerY" id="i6D-6Q-xUg"/>
+                                        <constraint firstItem="qCc-Am-7U7" firstAttribute="trailing" secondItem="Qjr-f6-CC9" secondAttribute="leading" constant="-8" id="maE-nR-b5O"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <outlet property="name" destination="qCc-Am-7U7" id="vwk-S9-XSS"/>
+                                    <outlet property="accordianButton" destination="ihQ-ML-iVw" id="vrQ-yl-bCV"/>
+                                    <outlet property="accordianButtonWidthConstraint" destination="pxE-W6-fcs" id="gpX-W2-wXc"/>
+                                    <outlet property="indentationConstraint" destination="5D5-eq-j5c" id="F4o-tb-d5u"/>
+                                    <outlet property="nameLabel" destination="qCc-Am-7U7" id="Rg1-24-oaQ"/>
+                                    <outlet property="visibilitySwitch" destination="Qjr-f6-CC9" id="49i-PM-IbO"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SublayerTitle" id="bWm-du-xG7" customClass="SublayerTitleCell" customModule="ArcGISToolkit" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SublayerTitle" id="bWm-du-xG7" customClass="LayerCell" customModule="ArcGISToolkit" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="92" width="414" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bWm-du-xG7" id="Bn6-3x-jb4">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ALc-1U-HGJ">
+                                            <rect key="frame" x="8" y="7" width="30" height="30"/>
+                                            <state key="normal" title="&gt;"/>
+                                            <connections>
+                                                <action selector="accordianAction:" destination="bWm-du-xG7" eventType="touchUpInside" id="QNW-bA-Gmy"/>
+                                            </connections>
+                                        </button>
                                         <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AOt-cv-VvJ">
-                                            <rect key="frame" x="8" y="11.5" width="398" height="20.5"/>
+                                            <rect key="frame" x="46" y="11.5" width="303" height="20.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L0l-6H-Q5f">
+                                            <rect key="frame" x="357" y="6.5" width="51" height="31"/>
+                                            <connections>
+                                                <action selector="visibilityChanged:" destination="bWm-du-xG7" eventType="valueChanged" id="1Hu-IJ-Znx"/>
+                                            </connections>
+                                        </switch>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="ALc-1U-HGJ" firstAttribute="leading" secondItem="Bn6-3x-jb4" secondAttribute="leading" constant="8" id="02m-8h-ns5"/>
+                                        <constraint firstItem="L0l-6H-Q5f" firstAttribute="centerY" secondItem="Bn6-3x-jb4" secondAttribute="centerY" id="10c-2A-NOT"/>
+                                        <constraint firstItem="AOt-cv-VvJ" firstAttribute="trailing" secondItem="L0l-6H-Q5f" secondAttribute="leading" constant="-8" id="1SD-Gq-Deq"/>
                                         <constraint firstItem="AOt-cv-VvJ" firstAttribute="centerY" secondItem="Bn6-3x-jb4" secondAttribute="centerY" id="D5o-eP-ME1"/>
-                                        <constraint firstAttribute="trailing" secondItem="AOt-cv-VvJ" secondAttribute="trailing" constant="8" id="FMJ-ym-XAb"/>
-                                        <constraint firstItem="AOt-cv-VvJ" firstAttribute="leading" secondItem="Bn6-3x-jb4" secondAttribute="leading" constant="8" id="NI2-jf-xaw"/>
+                                        <constraint firstAttribute="trailing" secondItem="L0l-6H-Q5f" secondAttribute="trailing" constant="8" id="EGU-Hk-Uqk"/>
+                                        <constraint firstItem="AOt-cv-VvJ" firstAttribute="leading" secondItem="ALc-1U-HGJ" secondAttribute="trailing" constant="8" id="WPf-Eu-D6j"/>
+                                        <constraint firstItem="ALc-1U-HGJ" firstAttribute="centerY" secondItem="Bn6-3x-jb4" secondAttribute="centerY" id="hH6-4c-ZAI"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <outlet property="name" destination="AOt-cv-VvJ" id="P7I-8l-Q4l"/>
+                                    <outlet property="accordianButton" destination="ALc-1U-HGJ" id="IOV-kr-Qsu"/>
+                                    <outlet property="indentationConstraint" destination="02m-8h-ns5" id="iHB-2A-9bx"/>
+                                    <outlet property="nameLabel" destination="AOt-cv-VvJ" id="lhA-Ie-YCt"/>
+                                    <outlet property="visibilitySwitch" destination="L0l-6H-Q5f" id="7aA-bR-4Ad"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
