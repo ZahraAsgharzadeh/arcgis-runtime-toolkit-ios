@@ -70,12 +70,19 @@ class LayerCell: UITableViewCell {
         }
     }
     
+    var showRowSeparator: Bool = true {
+        didSet {
+            separatorView.isHidden = !showRowSeparator
+        }
+    }
+
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var accordianButton: UIButton!
     @IBOutlet var visibilitySwitch: UISwitch!
     @IBOutlet var indentationConstraint: NSLayoutConstraint!
     @IBOutlet var accordianButtonWidthConstraint: NSLayoutConstraint!
-
+    @IBOutlet var separatorView: UIView!
+    
     @IBAction func accordianAction(_ sender: Any) {
     }
     
@@ -103,7 +110,7 @@ class LayerContentsTableViewController: UITableViewController {
     
     var config: LayerContentsConfiguration = LayerContentsViewController.TableOfContents() {
         didSet {
-            tableView.separatorStyle = config.showRowSeparator ? .singleLine : .none
+            tableView.separatorStyle = .none
             title = config.title
             tableView.reloadData()
         }
@@ -146,6 +153,7 @@ class LayerContentsTableViewController: UITableViewController {
             layerCell.layerContent = layer
             layerCell.showLayerAccordian = config.allowLayersAccordion
             layerCell.showLayerVisibility = config.allowToggleVisibility && layer.canChangeVisibility
+            layerCell.showRowSeparator = (indexPath.row > 0) && config.showRowSeparator
         case let layerContent as AGSLayerContent:
             // rowItem is not a layer, but still implements AGSLayerContent, so it's a sublayer
             let layerCell = tableView.dequeueReusableCell(withIdentifier: sublayerCellReuseIdentifier) as! LayerCell
@@ -153,6 +161,7 @@ class LayerContentsTableViewController: UITableViewController {
             layerCell.layerContent = layerContent
             layerCell.showLayerAccordian = config.allowLayersAccordion
             layerCell.showLayerVisibility = config.allowToggleVisibility && layerContent.canChangeVisibility
+            layerCell.showRowSeparator = (indexPath.row > 0) && config.showRowSeparator
         case let legendInfo as AGSLegendInfo:
             // rowItem is a legendInfo
             let layerInfoCell = tableView.dequeueReusableCell(withIdentifier: legendInfoCellReuseIdentifier) as! LegendInfoCell
@@ -182,8 +191,8 @@ class LayerContentsTableViewController: UITableViewController {
                         
                         // set the swatch into our dictionary and reload the row
                         self?.symbolSwatches[symbol] = image
-                        layerInfoCell.symbolImage = image
-                        //                        tableView.reloadRows(at: [indexPath], with: .automatic)
+//                        layerInfoCell.symbolImage = image
+                        tableView.reloadRows(at: [indexPath], with: .automatic)
                     })
                 }
             }
@@ -270,12 +279,6 @@ class LayerContentsTableViewController: UITableViewController {
     
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-    }
-    
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return config.allowLayerReordering
     }
     
     /*

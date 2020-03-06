@@ -20,7 +20,7 @@ class LayerContentsExample: MapViewController {
     var layerContentsVC: LayerContentsViewController?
     var layerContentsButton = UIBarButtonItem()
     var segmentedControl = UISegmentedControl(items: ["Legend", "TOC", "Custom"])
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -30,19 +30,20 @@ class LayerContentsExample: MapViewController {
 
         // Create the map from a portal item and assign to the mapView.
         let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
-        let portalItem = AGSPortalItem(portal: portal, itemID: "16f1b8ba37b44dc3884afc8d5f454dd2")
+
+        // Data Collection map:
+//        let portalItem = AGSPortalItem(portal: portal, itemID: "16f1b8ba37b44dc3884afc8d5f454dd2")
+        
+        // Original Legend Example map:
+        let portalItem = AGSPortalItem(portal: portal, itemID: "1966ef409a344d089b001df85332608f")
+
+        // Tourists-Copy
+//        let portalItem = AGSPortalItem(portal: portal, itemID: "c1492ff412db43e9b7320afbda639aa3")
+
         mapView.map = AGSMap(item: portalItem)
         mapView.map?.load { [weak self] (_) in
             self?.mapView.map?.basemap.baseLayers.forEach { ($0 as! AGSLayerContent).showInLegend = false }
         }
-        
-        // Create the LayerContentsViewController.
-        layerContentsVC = LayerContentsViewController()
-        layerContentsVC?.dataSource = DataSource(geoView: mapView)
-        
-        // Add a cancel button.
-        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
-        layerContentsVC?.navigationItem.leftBarButtonItem = doneButton
         
         segmentedControl.addTarget(self, action: #selector(segmentControlValueChanged), for: .valueChanged)
         view.addSubview(segmentedControl)
@@ -54,6 +55,7 @@ class LayerContentsExample: MapViewController {
         ])
         segmentedControl.backgroundColor = UIColor.lightGray.withAlphaComponent(0.75)
         segmentedControl.selectedSegmentIndex = 0
+        segmentControlValueChanged(segmentedControl)
     }
     
     @objc
@@ -77,48 +79,31 @@ class LayerContentsExample: MapViewController {
     @objc
     private func segmentControlValueChanged(_ sender: Any) {
         guard let control = sender as? UISegmentedControl else { return }
-        if control.selectedSegmentIndex == 0 {
-            struct Legend: LayerContentsConfiguration {
-                public var layersStyle: ConfigurationStyle = .visibleLayersAtScale
-                public var allowToggleVisibility: Bool = false
-                public var allowLayersAccordion: Bool = false
-                public var allowLayerReordering: Bool = false
-                public var showSymbology: Bool = true
-                public var respectInitialLayerOrder: Bool = false
-                public var respectShowInLegend: Bool = true
-                public var showRowSeparator: Bool = false
-                public var title: String = "Legend"
-            }
-            layerContentsVC?.config = Legend()
-//            layerContentsVC?.config = LayerContentsViewController.Legend()
-        } else if control.selectedSegmentIndex == 1 {
-            struct TableOfContents: LayerContentsConfiguration {
-                public var layersStyle = ConfigurationStyle.allLayers
-                public var allowToggleVisibility: Bool = true
-                public var allowLayersAccordion: Bool = true
-                public var allowLayerReordering: Bool = true
-                public var showSymbology: Bool = true
-                public var respectInitialLayerOrder: Bool = false
-                public var respectShowInLegend: Bool = false
-                public var showRowSeparator: Bool = true
-                public var title: String = "Table of Contents"
-            }
-            layerContentsVC?.config = TableOfContents()
-        } else if control.selectedSegmentIndex == 2 {
+        let dataSource = DataSource(geoView: mapView)
+        switch control.selectedSegmentIndex {
+        case 0:
+            layerContentsVC = Legend(dataSource)
+        case 1:
+            layerContentsVC = TableOfContents(dataSource)
+        default:
             struct CustomConfig: LayerContentsConfiguration {
                 public var layersStyle: ConfigurationStyle = .visibleLayersAtScale
                 public var allowToggleVisibility: Bool = true
                 public var allowLayersAccordion: Bool = false
-                public var allowLayerReordering: Bool = true
                 public var showSymbology: Bool = false
                 public var respectInitialLayerOrder: Bool = true
-                public var respectShowInLegend: Bool = true
-                public var showRowSeparator: Bool = false
+                public var respectShowInLegend: Bool = false
+                public var showRowSeparator: Bool = true
                 public var title: String = "Custom Configuration"
             }
 
+            layerContentsVC = LayerContentsViewController(dataSource)
             layerContentsVC?.config = CustomConfig()
         }
+        
+        // Add a done button.
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+        layerContentsVC?.navigationItem.leftBarButtonItem = doneButton
     }
 }
 

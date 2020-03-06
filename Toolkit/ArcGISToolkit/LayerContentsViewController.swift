@@ -36,9 +36,6 @@ public protocol LayerContentsConfiguration {
     /// Specifies whether layer/sublayer cells will include a chevron used show/hide the contents of a layer/sublayer.
     var allowLayersAccordion: Bool { get }
 
-    // Specifies whether to allow the user to reorder layers.
-    var allowLayerReordering: Bool { get }
-
     /// Specifies whether layers/sublayers should show it's symbols.
     var showSymbology: Bool { get }
     
@@ -57,6 +54,33 @@ public protocol LayerContentsConfiguration {
     /// The title of the view.
     var title: String { get }
 }
+
+/// Describes a `LayerContents` view configured to display a legend.
+/// - Since: 100.8.0
+public class Legend: LayerContentsViewController {
+    override public init() {
+        super.init()
+        config = LayerContentsViewController.Legend()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+/// Describes a `LayerContents` view configured to display a table of contents.
+/// - Since: 100.8.0
+public class TableOfContents: LayerContentsViewController {
+    override public init() {
+        super.init()
+        config = LayerContentsViewController.TableOfContents()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
 //
 ///// Defines how to display layers in the table.
 ///// - Since: 100.8.0
@@ -79,29 +103,27 @@ public protocol LayerContentsConfiguration {
 /// - Since: 100.8.0
 public class LayerContentsViewController: UIViewController {
     /// Provide an out of the box TOC configuration.
-    public struct TableOfContents: LayerContentsConfiguration {
-        public var layersStyle = ConfigurationStyle.allLayers
-        public var allowToggleVisibility: Bool = true
-        public var allowLayersAccordion: Bool = true
-        public var allowLayerReordering: Bool = true
-        public var showSymbology: Bool = true
-        public var respectInitialLayerOrder: Bool = false
-        public var respectShowInLegend: Bool = false
-        public var showRowSeparator: Bool = true
-        public var title: String = "Table of Contents"
+    internal struct TableOfContents: LayerContentsConfiguration {
+        var layersStyle = ConfigurationStyle.allLayers
+        var allowToggleVisibility: Bool = true
+        var allowLayersAccordion: Bool = true
+        var showSymbology: Bool = true
+        var respectInitialLayerOrder: Bool = false
+        var respectShowInLegend: Bool = false
+        var showRowSeparator: Bool = true
+        var title: String = "Table of Contents"
     }
     
     /// Provide an out of the box Legend configuration.
-    public struct Legend: LayerContentsConfiguration {
-        public var layersStyle: ConfigurationStyle = .visibleLayersAtScale
-        public var allowToggleVisibility: Bool = false
-        public var allowLayersAccordion: Bool = false
-        public var allowLayerReordering: Bool = false
-        public var showSymbology: Bool = true
-        public var respectInitialLayerOrder: Bool = false
-        public var respectShowInLegend: Bool = true
-        public var showRowSeparator: Bool = false
-        public var title: String = "Legend"
+    internal struct Legend: LayerContentsConfiguration {
+        var layersStyle: ConfigurationStyle = .visibleLayersAtScale
+        var allowToggleVisibility: Bool = false
+        var allowLayersAccordion: Bool = false
+        var showSymbology: Bool = true
+        var respectInitialLayerOrder: Bool = false
+        var respectShowInLegend: Bool = true
+        var showRowSeparator: Bool = false
+        var title: String = "Legend"
     }
     
     /// The `DataSource` specifying the list of `AGSLayerContent` to display.
@@ -114,7 +136,7 @@ public class LayerContentsViewController: UIViewController {
     
     /// The default configuration is a TOC. Setting a new configuration redraws the view.
     /// - Since: 100.8.0
-    public var config: LayerContentsConfiguration = Legend() {
+    public var config: LayerContentsConfiguration = TableOfContents() {
         didSet {
             layerContentsTableViewController?.config = config
             title = config.title
@@ -136,6 +158,19 @@ public class LayerContentsViewController: UIViewController {
     
     // The array of all contents (`AGSLayer`, `AGSLayerContent`, `AGSLegendInfo`) to display in the table view.
     private var contents = [AnyObject]()
+
+    public init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    public convenience init(_ dataSource: DataSource) {
+        self.init()
+        self.dataSource = dataSource
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -161,7 +196,11 @@ public class LayerContentsViewController: UIViewController {
             ])
             tableViewController.didMove(toParent: self)
         }
-        
+    }
+    
+    override public func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
         // Generate and set the layerContent list.
         generateLayerList()
 
@@ -203,6 +242,8 @@ public class LayerContentsViewController: UIViewController {
     
     // Load an individual layer as AGSLayerContent.
     private func loadIndividualLayer(_ layerContent: AGSLayerContent) {
+        print("loadIndividualLayer: \(layerContent)")
+
         if let layer = layerContent as? AGSLayer {
             // We have an AGSLayer, so make sure it's loaded.
             layer.load { [weak self] (_) in
@@ -224,17 +265,21 @@ public class LayerContentsViewController: UIViewController {
                 self?.updateContents()
             }
         }
+        
+        print("loadSublayersOrLegendInfos: \(layerContent)")
 
         // if we have sublayer contents, load those as well
         if !layerContent.subLayerContents.isEmpty {
             layerContent.subLayerContents.forEach { loadIndividualLayer($0) }
-        } else {
+        } else if config.showSymbology {
             // fetch the legend infos
             layerContent.fetchLegendInfos { [weak self] (legendInfos, _) in
                 // Store legendInfos and then update contents
                 self?.legendInfos[LayerContentsViewController.objectIdentifierFor(layerContent)] = legendInfos
                 self?.updateContents()
             }
+        } else {
+            updateContents()
         }
     }
     
@@ -245,14 +290,16 @@ public class LayerContentsViewController: UIViewController {
     private func updateContents() {
         contents.removeAll()
         
-        // filter any layers which are not visible or not showInLegend
-        if config.layersStyle == .visibleLayersAtScale {
-            displayedLayers = displayedLayers.filter { $0.isVisible &&
-                (config.respectShowInLegend ? $0.showInLegend : true)
-            }
-        }
-        
-//        let legendLayers = displayedLayers.filter { $0.isVisible && (config.respectShowInLegend ? $0.showInLegend : true) }
+        print("--- updateContents()")
+  
+    //---- already do this above...
+//        // filter any layers which are not visible or not showInLegend
+//        if config.layersStyle == .visibleLayersAtScale {
+//            displayedLayers = displayedLayers.filter { $0.isVisible &&
+//                (config.respectShowInLegend ? $0.showInLegend : true)
+//            }
+//        }
+
         displayedLayers.forEach { (layerContent) in
             var showAtScale = true
 
@@ -262,6 +309,7 @@ public class LayerContentsViewController: UIViewController {
                 let viewpoint = dataSource?.geoView?.currentViewpoint(with: .centerAndScale),
                 !viewpoint.targetScale.isNaN {
                 showAtScale = layerContent.isVisible(atScale: viewpoint.targetScale)
+//                print("Layer: \(layerContent); showAtScale = \(showAtScale); scale = \(viewpoint.targetScale)")
             }
             
             // if we're showing the layerContent, add it to our legend array
@@ -290,8 +338,16 @@ public class LayerContentsViewController: UIViewController {
             // filter any sublayers which are not visible or not showInLegend
             let sublayerContents = layerContent.subLayerContents.filter { $0.isVisible && $0.showInLegend }
             sublayerContents.forEach { (layerContent) in
-                contents.append(layerContent)
-                updateLayerLegend(layerContent)
+                var showAtScale = true
+                if config.layersStyle == .visibleLayersAtScale,
+                    let viewpoint = dataSource?.geoView?.currentViewpoint(with: .centerAndScale),
+                    !viewpoint.targetScale.isNaN {
+                    showAtScale = layerContent.isVisible(atScale: viewpoint.targetScale)
+                }
+                if showAtScale {
+                    contents.append(layerContent)
+                    updateLayerLegend(layerContent)
+                }
             }
         } else {
             if let internalLegendInfos: [AGSLegendInfo] = legendInfos[LayerContentsViewController.objectIdentifierFor(layerContent as AnyObject)] {
