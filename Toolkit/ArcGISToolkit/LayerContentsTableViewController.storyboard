@@ -17,24 +17,24 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="LegendInfo" id="T7O-LW-tWV" customClass="LegendInfoCell" customModule="ArcGISToolkit" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="414" height="20.5"/>
+                                <rect key="frame" x="0.0" y="28" width="414" height="37.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="T7O-LW-tWV" id="Qf1-w4-64A">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="20.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="37.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <activityIndicatorView opaque="NO" tag="3" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="bD6-Rq-9Ez">
-                                            <rect key="frame" x="8" y="0.0" width="20.5" height="20.5"/>
+                                        <activityIndicatorView opaque="NO" tag="3" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="bD6-Rq-9Ez">
+                                            <rect key="frame" x="8" y="0.0" width="37.5" height="37.5"/>
                                         </activityIndicatorView>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" tag="2" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ENx-U2-2wK">
-                                            <rect key="frame" x="8" y="0.0" width="20.5" height="20.5"/>
+                                            <rect key="frame" x="8" y="0.0" width="37.5" height="37.5"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" secondItem="ENx-U2-2wK" secondAttribute="height" multiplier="1:1" id="cnz-WL-Gmt"/>
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UYu-Ab-2C2">
-                                            <rect key="frame" x="36.5" y="0.5" width="369.5" height="19.5"/>
-                                            <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                            <rect key="frame" x="53.5" y="8.5" width="352.5" height="20.5"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -60,13 +60,13 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="LayerTitle" id="gj6-Kb-3zF" customClass="LayerCell" customModule="ArcGISToolkit" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="48.5" width="414" height="43.5"/>
+                                <rect key="frame" x="0.0" y="65.5" width="414" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="gj6-Kb-3zF" id="eiZ-cd-Upr">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qCc-Am-7U7">
+                                        <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qCc-Am-7U7">
                                             <rect key="frame" x="46" y="11.5" width="303" height="20.5"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                             <nil key="textColor"/>
@@ -119,7 +119,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SublayerTitle" id="bWm-du-xG7" customClass="LayerCell" customModule="ArcGISToolkit" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="92" width="414" height="43.5"/>
+                                <rect key="frame" x="0.0" y="109" width="414" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bWm-du-xG7" id="Bn6-3x-jb4">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -135,7 +135,7 @@
                                                 <action selector="accordianAction:" destination="bWm-du-xG7" eventType="touchUpInside" id="QNW-bA-Gmy"/>
                                             </connections>
                                         </button>
-                                        <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AOt-cv-VvJ">
+                                        <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AOt-cv-VvJ">
                                             <rect key="frame" x="46" y="11.5" width="303" height="20.5"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                             <nil key="textColor"/>
@@ -148,7 +148,7 @@
                                             </connections>
                                         </switch>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XHM-ef-iJu" userLabel="SeparatorView">
-                                            <rect key="frame" x="46" y="-2" width="303" height="1"/>
+                                            <rect key="frame" x="46" y="-1" width="303" height="1"/>
                                             <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="1" id="Usu-9a-twz"/>
@@ -159,7 +159,7 @@
                                         <constraint firstItem="ALc-1U-HGJ" firstAttribute="leading" secondItem="Bn6-3x-jb4" secondAttribute="leading" constant="8" id="02m-8h-ns5"/>
                                         <constraint firstItem="L0l-6H-Q5f" firstAttribute="centerY" secondItem="Bn6-3x-jb4" secondAttribute="centerY" id="10c-2A-NOT"/>
                                         <constraint firstItem="AOt-cv-VvJ" firstAttribute="trailing" secondItem="L0l-6H-Q5f" secondAttribute="leading" constant="-8" id="1SD-Gq-Deq"/>
-                                        <constraint firstItem="XHM-ef-iJu" firstAttribute="top" secondItem="Bn6-3x-jb4" secondAttribute="top" constant="-2" id="Ayg-En-uq5"/>
+                                        <constraint firstItem="XHM-ef-iJu" firstAttribute="top" secondItem="Bn6-3x-jb4" secondAttribute="top" constant="-1" id="Ayg-En-uq5"/>
                                         <constraint firstItem="AOt-cv-VvJ" firstAttribute="centerY" secondItem="Bn6-3x-jb4" secondAttribute="centerY" id="D5o-eP-ME1"/>
                                         <constraint firstItem="XHM-ef-iJu" firstAttribute="leading" secondItem="ALc-1U-HGJ" secondAttribute="trailing" constant="8" id="DQ9-Fh-7VV"/>
                                         <constraint firstAttribute="trailing" secondItem="L0l-6H-Q5f" secondAttribute="trailing" constant="8" id="EGU-Hk-Uqk"/>

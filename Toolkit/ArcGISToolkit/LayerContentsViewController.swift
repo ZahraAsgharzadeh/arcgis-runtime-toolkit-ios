@@ -15,6 +15,11 @@
 import UIKit
 import ArcGIS
 
+// TODO:
+// - Accordian: new icon, animation, actual accordianing...
+// - Sublayer testing
+// - Loading testing
+
 /// Defines how to display layers in the table.
 /// - Since: 100.8.0
 public enum ConfigurationStyle {
@@ -28,30 +33,38 @@ public enum ConfigurationStyle {
 /// - Since: 100.8.0
 public protocol LayerContentsConfiguration {
     /// Specifies the `ConfigurationStyle` applied to the table.
+    /// - Since: 100.8.0
     var layersStyle: ConfigurationStyle { get }
     
     /// Specifies whether layer/sublayer cells will include a switch used to toggle visibility of the layer.
+    /// - Since: 100.8.0
     var allowToggleVisibility: Bool { get }
     
     /// Specifies whether layer/sublayer cells will include a chevron used show/hide the contents of a layer/sublayer.
+    /// - Since: 100.8.0
     var allowLayersAccordion: Bool { get }
 
     /// Specifies whether layers/sublayers should show it's symbols.
+    /// - Since: 100.8.0
     var showSymbology: Bool { get }
     
     /// Specifies whether to respect the layer order or to reverse the layer order supplied.
     /// If provided a geoView, the layer will include the basemap.
     /// - If `false`, the top layer's information appears at the top of the legend and the base map's layer information appears at the bottom of the legend.
     /// - If `true`, this order is reversed.
+    /// - Since: 100.8.0
     var respectInitialLayerOrder: Bool { get }
     
     /// Specifies whether to respect `LayerConents.showInLegend` when deciding whether to include the layer.
+    /// - Since: 100.8.0
     var respectShowInLegend: Bool { get }
     
     /// Specifies whether to include separators between layer cells.
+    /// - Since: 100.8.0
     var showRowSeparator: Bool { get }
     
     /// The title of the view.
+    /// - Since: 100.8.0
     var title: String { get }
 }
 
@@ -81,22 +94,65 @@ public class TableOfContents: LayerContentsViewController {
     }
 }
 
-//
-///// Defines how to display layers in the table.
-///// - Since: 100.8.0
-//internal enum ContentType {
-//    // An `AGSLayer`.
-//    case layer
-//    // A sublayer which implements `AGSLayerContent` but does not inherit from`AGSLayer`.
-//    case sublayer
-//    // An `AGSLegendInfo`.
-//    case legendInfo
-//}
-//
-//internal class Content {
-//    let contentType: ContentType = .layer
-//    let content: AnyObject?
-//}
+/// Defines how to display layers in the table.
+/// - Since: 100.8.0
+internal enum ContentType {
+    // An `AGSLayer`.
+    case layer
+    // A sublayer which implements `AGSLayerContent` but does not inherit from`AGSLayer`.
+    case sublayer
+    // An `AGSLegendInfo`.
+    case legendInfo
+}
+
+/// Defines how to display the accordian control for the layer.
+/// - Since: 100.8.0
+internal enum AccordianDisplay {
+    // The layer is expanded.
+    case expanded
+    // The layer is collapsed.
+    case collapsed
+    // No accordian control.
+    case none
+}
+
+internal class Content {
+    var contentType: ContentType = .layer
+    var content: AnyObject?
+    var name: String = ""
+    var indentationLevel: Int = 0
+    var accordian: AccordianDisplay = .expanded
+    var allowToggleVisibility: Bool = false
+    var isVisibilityToggleOn: Bool = false
+    var isVisibleAtScale: Bool = true
+    
+    convenience init(_ content: AnyObject, config: LayerContentsConfiguration) {
+        self.init()
+        self.content = content
+        
+        switch content {
+        case let layer as AGSLayer:
+            // content is a layer.
+            contentType = .layer
+            name = layer.name
+            accordian = config.allowLayersAccordion && layer.subLayerContents.count > 1 ? .expanded : .none
+            allowToggleVisibility = config.allowToggleVisibility && layer.canChangeVisibility
+            isVisibilityToggleOn = layer.isVisible
+        case let layerContent as AGSLayerContent:
+            // content is a layerContent.
+            contentType = .sublayer
+            name = layerContent.name
+            accordian = config.allowLayersAccordion && layerContent.subLayerContents.count > 1 ? .expanded : .none
+            allowToggleVisibility = config.allowToggleVisibility && layerContent.canChangeVisibility
+            isVisibilityToggleOn = layerContent.isVisible
+        case let legendInfo as AGSLegendInfo:
+            contentType = .legendInfo
+            name = legendInfo.name
+        default:
+            break
+        }
+    }
+}
 
 /// Describes a `LayerContentsViewController` for a list of Layers, possibly contained in a GeoView.
 /// The `LayerContentsViewController` can be styled to that of a legend, table of contents or some custom derivative.
@@ -104,7 +160,7 @@ public class TableOfContents: LayerContentsViewController {
 public class LayerContentsViewController: UIViewController {
     /// Provide an out of the box TOC configuration.
     internal struct TableOfContents: LayerContentsConfiguration {
-        var layersStyle = ConfigurationStyle.allLayers
+        var layersStyle: ConfigurationStyle = .allLayers
         var allowToggleVisibility: Bool = true
         var allowLayersAccordion: Bool = true
         var showSymbology: Bool = true
@@ -157,7 +213,7 @@ public class LayerContentsViewController: UIViewController {
     private var displayedLayers = [AGSLayerContent]()
     
     // The array of all contents (`AGSLayer`, `AGSLayerContent`, `AGSLegendInfo`) to display in the table view.
-    private var contents = [AnyObject]()
+    private var contents = [Content]()
 
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -219,7 +275,7 @@ public class LayerContentsViewController: UIViewController {
         contents.removeAll()
         displayedLayers.removeAll()
         
-        guard let layerContents = dataSource?.layerContents else { layerContentsTableViewController?.contents = [AnyObject](); return }
+        guard let layerContents = dataSource?.layerContents else { layerContentsTableViewController?.contents = [Content](); return }
         
         // visibility
         // showInLegend
@@ -242,7 +298,7 @@ public class LayerContentsViewController: UIViewController {
     
     // Load an individual layer as AGSLayerContent.
     private func loadIndividualLayer(_ layerContent: AGSLayerContent) {
-        print("loadIndividualLayer: \(layerContent)")
+        print("loadIndividualLayer: \(layerContent); name = \(layerContent.name)")
 
         if let layer = layerContent as? AGSLayer {
             // We have an AGSLayer, so make sure it's loaded.
@@ -266,7 +322,7 @@ public class LayerContentsViewController: UIViewController {
             }
         }
         
-        print("loadSublayersOrLegendInfos: \(layerContent)")
+        print("loadSublayersOrLegendInfos: \(layerContent); name = \(layerContent.name)")
 
         // if we have sublayer contents, load those as well
         if !layerContent.subLayerContents.isEmpty {
@@ -301,27 +357,24 @@ public class LayerContentsViewController: UIViewController {
 //        }
 
         displayedLayers.forEach { (layerContent) in
-            var showAtScale = true
-
             // If we're display only visible layers at scale,
             // make sure our layerContent is visible at the current scale.
-            if config.layersStyle == .visibleLayersAtScale,
-                let viewpoint = dataSource?.geoView?.currentViewpoint(with: .centerAndScale),
-                !viewpoint.targetScale.isNaN {
-                showAtScale = layerContent.isVisible(atScale: viewpoint.targetScale)
-//                print("Layer: \(layerContent); showAtScale = \(showAtScale); scale = \(viewpoint.targetScale)")
-            }
-            
+            let showAtScale = shouldShowAtScale(layerContent)
+
             // if we're showing the layerContent, add it to our legend array
-            if showAtScale {
+            if (config.layersStyle == .visibleLayersAtScale && showAtScale) || config.layersStyle == .allLayers {
                 if let featureCollectionLayer = layerContent as? AGSFeatureCollectionLayer {
                     // only show Feature Collection layer if the sublayer count is > 1
                     // but always show the sublayers (the call to `updateLayerLegend`)
                     if featureCollectionLayer.layers.count > 1 {
-                        contents.append(layerContent)
+                        let content = Content(layerContent, config: config)
+                        content.isVisibleAtScale = showAtScale
+                        contents.append(content)
                     }
                 } else {
-                    contents.append(layerContent)
+                    let content = Content(layerContent, config: config)
+                    content.isVisibleAtScale = showAtScale
+                    contents.append(content)
                 }
                 updateLayerLegend(layerContent)
             }
@@ -330,28 +383,34 @@ public class LayerContentsViewController: UIViewController {
         // Set the contents on the table view controller.
         layerContentsTableViewController?.contents = contents
     }
-    
-    // Handle subLayerContents and legend infos; this method assumes that
-    // the incoming layerContent argument is visible and showInLegend == true.
+
     private func updateLayerLegend(_ layerContent: AGSLayerContent) {
         if !layerContent.subLayerContents.isEmpty {
             // filter any sublayers which are not visible or not showInLegend
-            let sublayerContents = layerContent.subLayerContents.filter { $0.isVisible && $0.showInLegend }
-            sublayerContents.forEach { (layerContent) in
-                var showAtScale = true
-                if config.layersStyle == .visibleLayersAtScale,
-                    let viewpoint = dataSource?.geoView?.currentViewpoint(with: .centerAndScale),
-                    !viewpoint.targetScale.isNaN {
-                    showAtScale = layerContent.isVisible(atScale: viewpoint.targetScale)
-                }
-                if showAtScale {
-                    contents.append(layerContent)
-                    updateLayerLegend(layerContent)
+//            let sublayerContents = layerContent.subLayerContents.filter { $0.isVisible && $0.showInLegend }
+            let sublayerContents = layerContent.subLayerContents.filter { ($0.isVisible &&
+                (config.respectShowInLegend ? $0.showInLegend : true)) || config.layersStyle == .allLayers}
+            
+            sublayerContents.forEach { (subLayerContent) in
+                let showAtScale = shouldShowAtScale(subLayerContent)
+                
+                if (config.layersStyle == .visibleLayersAtScale && showAtScale) || config.layersStyle == .allLayers {
+                    let content = Content(subLayerContent, config: config)
+                    content.isVisibleAtScale = showAtScale
+                    contents.append(content)
+                    updateLayerLegend(subLayerContent)
                 }
             }
         } else {
             if let internalLegendInfos: [AGSLegendInfo] = legendInfos[LayerContentsViewController.objectIdentifierFor(layerContent as AnyObject)] {
-                contents += internalLegendInfos
+                let showAtScale = shouldShowAtScale(layerContent)
+                let contentArray = internalLegendInfos.map { legendInfo -> Content in
+                    let content = Content(legendInfo, config: config)
+                    content.isVisibleAtScale = showAtScale
+                    return content
+                }
+
+                contents += contentArray
             }
         }
     }
@@ -362,5 +421,16 @@ public class LayerContentsViewController: UIViewController {
     // and we need to use it as the key in our dictionary of legendInfo arrays.
     private static func objectIdentifierFor(_ obj: AnyObject) -> UInt {
         return UInt(bitPattern: ObjectIdentifier(obj))
+    }
+    
+    // Handle subLayerContents and legend infos; this method assumes that
+    // the incoming layerContent argument is visible and showInLegend == true.
+    fileprivate func shouldShowAtScale(_ layerContent: AGSLayerContent) -> Bool {
+        if let viewpoint = dataSource?.geoView?.currentViewpoint(with: .centerAndScale),
+            !viewpoint.targetScale.isNaN {
+            return layerContent.isVisible(atScale: viewpoint.targetScale)
+        }
+        
+        return true
     }
 }

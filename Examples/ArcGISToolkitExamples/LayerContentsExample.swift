@@ -35,15 +35,31 @@ class LayerContentsExample: MapViewController {
 //        let portalItem = AGSPortalItem(portal: portal, itemID: "16f1b8ba37b44dc3884afc8d5f454dd2")
         
         // Original Legend Example map:
-        let portalItem = AGSPortalItem(portal: portal, itemID: "1966ef409a344d089b001df85332608f")
+//        let portalItem = AGSPortalItem(portal: portal, itemID: "1966ef409a344d089b001df85332608f")
 
         // Tourists-Copy
 //        let portalItem = AGSPortalItem(portal: portal, itemID: "c1492ff412db43e9b7320afbda639aa3")
+        
+        // Legend Test Map
+//        let runtimePortal = AGSPortal(url: URL(string: "https://runtime.maps.arcgis.com")!, loginRequired: true)
+        let runtimePortal = AGSPortal(url: URL(string: "https://arcgisruntime.maps.arcgis.com")!, loginRequired: true)
+        
+        // Nathan's Original
+        let portalItem = AGSPortalItem(portal: portal, itemID: "ae726dacbf5f49b6bdd9c497b302feee")
+        
+        // Feature Collection
+//        let portalItem = AGSPortalItem(portal: portal, itemID: "f05664d6b1a74d39b5cec81f0e5b6513")
+        
+        // Raster
+//        let portalItem = AGSPortalItem(portal: portal, itemID: "d012b98dd9df45fe940ea96b631f66af")
+        
+        // LayerContents
+//        let portalItem = AGSPortalItem(portal: portal, itemID: "6fcfa8f789e44bc3846040b0d6ba9030")
 
         mapView.map = AGSMap(item: portalItem)
-        mapView.map?.load { [weak self] (_) in
-            self?.mapView.map?.basemap.baseLayers.forEach { ($0 as! AGSLayerContent).showInLegend = false }
-        }
+//        mapView.map?.load { [weak self] (_) in
+//            self?.mapView.map?.basemap.baseLayers.forEach { ($0 as! AGSLayerContent).showInLegend = false }
+//        }
         
         segmentedControl.addTarget(self, action: #selector(segmentControlValueChanged), for: .valueChanged)
         view.addSubview(segmentedControl)

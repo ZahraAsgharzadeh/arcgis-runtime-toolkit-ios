@@ -44,23 +44,15 @@ class LegendInfoCell: UITableViewCell {
 }
 
 class LayerCell: UITableViewCell {
-    var layerContent: AGSLayerContent? {
+    var content: Content? {
         didSet {
-            nameLabel.text = layerContent?.name
-        }
-    }
-    
-    var showLayerAccordian: Bool = false {
-        didSet {
-            accordianButton.isHidden = !showLayerAccordian
-            accordianButtonWidthConstraint.constant = showLayerAccordian ? accordianButton.frame.height : 0.0
-//            NSLayoutConstraint.activate([accordianButton.widthAnchor.constraint(equalToConstant: showLayerAccordian ? accordianButton.frame.height : 0.0)])
-        }
-    }
-    
-    var showLayerVisibility: Bool = false {
-        didSet {
-            visibilitySwitch.isHidden = !showLayerVisibility
+            nameLabel.text = content?.name
+            nameLabel.textColor = (content?.isVisibilityToggleOn ?? false) ? UIColor.black : UIColor.lightGray
+            accordianButton.isHidden = (content?.accordian == AccordianDisplay.none)
+            accordianButtonWidthConstraint.constant = !accordianButton.isHidden ? accordianButton.frame.height : 0.0
+
+            visibilitySwitch.isHidden = !(content?.allowToggleVisibility ?? false)
+            visibilitySwitch.isOn = content?.isVisibilityToggleOn ?? false
         }
     }
     
@@ -87,7 +79,9 @@ class LayerCell: UITableViewCell {
     }
     
     @IBAction func visibilityChanged(_ sender: Any) {
-        layerContent?.isVisible = (sender as! UISwitch).isOn
+        (content?.content as? AGSLayerContent)?.isVisible = (sender as! UISwitch).isOn
+        content?.isVisibilityToggleOn = (sender as! UISwitch).isOn
+        nameLabel.textColor = (content?.isVisibilityToggleOn ?? false) ? UIColor.black : UIColor.lightGray
     }
 }
 
@@ -102,7 +96,7 @@ class LayerContentsTableViewController: UITableViewController {
     // layers of type AGSLayers,
     // sublayers which implement AGSLayerContent but are not AGSLayers,
     // legend infos of type AGSLegendInfo
-    var contents = [AnyObject]() {
+    var contents = [Content]() {
         didSet {
             tableView.reloadData()
         }
@@ -144,33 +138,29 @@ class LayerContentsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Create and configure the cell...
         var cell: UITableViewCell!
-        let rowItem: AnyObject = contents[indexPath.row]
-        switch rowItem {
-        case let layer as AGSLayer:
+        let rowItem: Content = contents[indexPath.row]
+        switch rowItem.contentType {
+        case .layer:
             // rowItem is a layer
             let layerCell = tableView.dequeueReusableCell(withIdentifier: layerCellReuseIdentifier) as! LayerCell
             cell = layerCell
-            layerCell.layerContent = layer
-            layerCell.showLayerAccordian = config.allowLayersAccordion
-            layerCell.showLayerVisibility = config.allowToggleVisibility && layer.canChangeVisibility
+            layerCell.content = rowItem
             layerCell.showRowSeparator = (indexPath.row > 0) && config.showRowSeparator
-        case let layerContent as AGSLayerContent:
+        case .sublayer:
             // rowItem is not a layer, but still implements AGSLayerContent, so it's a sublayer
             let layerCell = tableView.dequeueReusableCell(withIdentifier: sublayerCellReuseIdentifier) as! LayerCell
             cell = layerCell
-            layerCell.layerContent = layerContent
-            layerCell.showLayerAccordian = config.allowLayersAccordion
-            layerCell.showLayerVisibility = config.allowToggleVisibility && layerContent.canChangeVisibility
+            layerCell.content = rowItem
             layerCell.showRowSeparator = (indexPath.row > 0) && config.showRowSeparator
-        case let legendInfo as AGSLegendInfo:
+        case .legendInfo:
             // rowItem is a legendInfo
             let layerInfoCell = tableView.dequeueReusableCell(withIdentifier: legendInfoCellReuseIdentifier) as! LegendInfoCell
             cell = layerInfoCell
-            layerInfoCell.legendInfo = legendInfo
+            layerInfoCell.legendInfo = rowItem.content as? AGSLegendInfo
             layerInfoCell.layerIndentationLevel = 0
             
             //            let imageview = cell.viewWithTag(LegendViewController.imageViewTag) as? UIImageView
-            if let symbol = legendInfo.symbol {
+            if let symbol = layerInfoCell.legendInfo?.symbol {
                 //                let activityIndicator = cell.viewWithTag(LegendViewController.activityIndicatorTag) as! UIActivityIndicatorView
                 if let swatch = self.symbolSwatches[symbol] {
                     // We have a swatch, so set it into the imageView and stop the activity indicator
@@ -196,9 +186,6 @@ class LayerContentsTableViewController: UITableViewController {
                     })
                 }
             }
-        default:
-            cell = UITableViewCell()
-            cell.textLabel?.text = "No Data"
         }
         //        if let layer = rowItem as? AGSLayer {
         //            // item is a layer
